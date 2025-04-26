@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nudge - Patient Reminder Dashboard</title>
+    <style>
+        :root {
+            --primary: #36b4f7; /* Nudge blue */
+            --primary-dark: #2ea3e6;
+            --secondary: #64748b;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 45px;
+            width: auto;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: var(--primary);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+        
+        .input-file {
+            display: none;
+        }
+        
+        .file-upload-container {
+            border: 2px dashed #cbd5e1;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .file-upload-container:hover {
+            border-color: var(--primary);
+        }
+        
+        .file-upload-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-scheduled {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-sent {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-confirmed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-missed {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            color: var(--secondary);
+            transition: background-color 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background-color: #f1f5f9;
+            color: var(--primary);
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+        }
+        
+        .stat-card h3 {
+            color: var(--secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .stat-card .change {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        .change.positive {
+            color: var(--success);
+        }
+        
+        .change.negative {
+            color: var(--danger);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            color: var(--secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--secondary);
+        }
+        
+        .modal-footer {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="nudge.png" alt="Nudge Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Dashboard</a></li>
+                <li><a href="#">Patients</a></li>
+                <li><a href="#">Reports</a></li>
+                <li><a href="#">Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="dashboard-header">
+            <h1>Patient Reminders Dashboard</h1>
+            <button class="btn" id="addPatientBtn">+ Add Patient</button>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>TOTAL PATIENTS</h3>
+                <div class="number">124</div>
+                <div class="change positive">
+                    ↑ 12% from last month
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>SCHEDULED REMINDERS</h3>
+                <div class="number">38</div>
+                <div class="change">
+                    Next 7 days
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>APPOINTMENT RATE</h3>
+                <div class="number">86%</div>
+                <div class="change positive">
+                    ↑ 4% from last month
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>MISSED APPOINTMENTS</h3>
+                <div class="number">7</div>
+                <div class="change negative">
+                    ↑ 2 from last month
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Add Patient Appointments</h2>
+            <div class="form-group">
+                <label for="uploadMethod">Upload Method</label>
+                <select id="uploadMethod">
+                    <option value="bulk">Bulk Upload (CSV/Excel)</option>
+                    <option value="manual">Manual Entry</option>
+                </select>
+            </div>
+            
+            <div id="bulkUploadContainer">
+                <div class="form-group">
+                    <label for="fileUpload">Upload Patient Data</label>
+                    <input type="file" id="fileUpload" class="input-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    <div class="file-upload-container" id="uploadArea">
+                        <div class="file-upload-icon">📄</div>
+                        <p>Drag and drop your CSV or Excel file here</p>
+                        <p>- or -</p>
+                        <button class="btn btn-outline" id="browseBtn">Browse Files</button>
+                        <p class="file-name" id="fileName"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn" id="uploadBtn" disabled>Upload Patients</button>
+                    <a href="#" id="downloadTemplate">Download template</a>
+                </div>
+            </div>
+            
+            <div id="manualEntryContainer" style="display: none;">
+                <div class="form-group">
+                    <label for="patientPhone">Patient Phone Number</label>
+                    <input type="tel" id="patientPhone" placeholder="e.g., +1234567890">
+                </div>
+                <div class="form-group">
+                    <label for="appointmentDate">Appointment Date</label>
+                    <input type="date" id="appointmentDate">
+                </div>
+                <div class="form-group">
+                    <label for="appointmentTime">Appointment Time</label>
+                    <input type="time" id="appointmentTime">
+                </div>
+                <div class="form-group">
+                    <label for="reminderDays">Send Reminder Days Before</label>
+                    <select id="reminderDays">
+                        <option value="1">1 day before</option>
+                        <option value="2">2 days before</option>
+                        <option value="3" selected>3 days before</option>
+                        <option value="5">5 days before</option>
+                        <option value="7">7 days before</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn" id="addPatientManually">Add Patient</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Upcoming Appointments</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Phone Number</th>
+                            <th>Appointment Date</th>
+                            <th>Reminder Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>+1234567890</td>
+                            <td>April 29, 2025</td>
+                            <td>April 26, 2025</td>
+                            <td><span class="status status-scheduled">Scheduled</span></td>
+                            <td class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>+0987654321</td>
+                            <td>April 28, 2025</td>
+                            <td>April 25, 2025</td>
+                            <td><span class="status status-sent">Reminder Sent</span></td>
+                            <td class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>+2345678901</td>
+                            <td>April 27, 2025</td>
+                            <td>April 24, 2025</td>
+                            <td><span class="status status-confirmed">Confirmed</span></td>
+                            <td class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>+3456789012</td>
+                            <td>April 26, 2025</td>
+                            <td>April 23, 2025</td>
+                            <td><span class="status status-missed">Missed</span></td>
+                            <td class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Add Patient Modal -->
+    <div class="modal" id="addPatientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Patient</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="newPatientPhone">Phone Number</label>
+                <input type="tel" id="newPatientPhone" placeholder="e.g., +1234567890">
+            </div>
+            <div class="form-group">
+                <label for="newPatientName">Patient Name (Optional)</label>
+                <input type="text" id="newPatientName" placeholder="Full Name">
+            </div>
+            <div class="form-group">
+                <label for="newAppointmentDate">Appointment Date</label>
+                <input type="date" id="newAppointmentDate">
+            </div>
+            <div class="form-group">
+                <label for="newAppointmentTime">Appointment Time</label>
+                <input type="time" id="newAppointmentTime">
+            </div>
+            <div class="form-group">
+                <label for="newReminderDays">Send Reminder Days Before</label>
+                <select id="newReminderDays">
+                    <option value="1">1 day before</option>
+                    <option value="2">2 days before</option>
+                    <option value="3" selected>3 days before</option>
+                    <option value="5">5 days before</option>
+                    <option value="7">7 days before</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAddPatient">Cancel</button>
+                <button class="btn" id="confirmAddPatient">Add Patient</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 Nudge Health Communications | Simplifying Patient Engagement
+    </footer>
+
+    <script>
+        // DOM Elements
+        const uploadMethodSelect = document.getElementById('uploadMethod');
+        const bulkUploadContainer = document.getElementById('bulkUploadContainer');
+        const manualEntryContainer = document.getElementById('manualEntryContainer');
+        const fileUpload = document.getElementById('fileUpload');
+        const uploadArea = document.getElementById('uploadArea');
+        const browseBtn = document.getElementById('browseBtn');
+        const fileName = document.getElementById('fileName');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        // Modal Elements
+        const addPatientBtn = document.getElementById('addPatientBtn');
+        const addPatientModal = document.getElementById('addPatientModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAddPatient = document.getElementById('cancelAddPatient');
+        const confirmAddPatient = document.getElementById('confirmAddPatient');
+        const addPatientManually = document.getElementById('addPatientManually');
+        
+        // Toggle between bulk upload and manual entry
+        uploadMethodSelect.addEventListener('change', function() {
+            if (this.value === 'bulk') {
+                bulkUploadContainer.style.display = 'block';
+                manualEntryContainer.style.display = 'none';
+            } else {
+                bulkUploadContainer.style.display = 'none';
+                manualEntryContainer.style.display = 'block';
+            }
+        });
+        
+        // File upload functionality
+        browseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            fileUpload.click();
+        });
+        
+        fileUpload.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+                uploadBtn.disabled = false;
+            }
+        });
+        
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#36b4f7';
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#cbd5e1';
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#cbd5e1';
+            
+            if (e.dataTransfer.files.length > 0) {
+                fileUpload.files = e.dataTransfer.files;
+                fileName.textContent = e.dataTransfer.files[0].name;
+                uploadBtn.disabled = false;
+            }
+        });
+        
+        // Modal functionality
+        addPatientBtn.addEventListener('click', function() {
+            addPatientModal.classList.add('show');
+        });
+        
+        closeModal.addEventListener('click', function() {
+            addPatientModal.classList.remove('show');
+        });
+        
+        cancelAddPatient.addEventListener('click', function() {
+            addPatientModal.classList.remove('show');
+        });
+        
+        confirmAddPatient.addEventListener('click', function() {
+            // Here you would add logic to save the new patient
+            addPatientModal.classList.remove('show');
+            // For demo purposes, we can just show an alert
+            alert('Patient added successfully!');
+        });
+        
+        // Manual add patient button
+        addPatientManually.addEventListener('click', function() {
+            const phoneNumber = document.getElementById('patientPhone').value;
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            
+            if (!phoneNumber || !appointmentDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // For demo purposes, show an alert
+            alert('Patient added successfully!');
+            
+            // Clear the form
+            document.getElementById('patientPhone').value = '';
+            document.getElementById('appointmentDate').value = '';
+            document.getElementById('appointmentTime').value = '';
+        });
+        
+        // Upload button functionality
+        uploadBtn.addEventListener('click', function() {
+            // Here you would add logic to process the uploaded file
+            // For demo purposes, we can just show an alert
+            alert('File uploaded successfully! Processing patient data...');
+            
+            // Reset the file input
+            fileUpload.value = '';
+            fileName.textContent = '';
+            uploadBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
